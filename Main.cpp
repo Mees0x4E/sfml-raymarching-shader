@@ -1,11 +1,14 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include <ctime>
 
 /* If MEASURE_FPS is set to 0, framerate will be limited to 60 fps
- * If MEASURE_FPS is set to 1, framerate will not be 
+ * If MEASURE_FPS is set to 1, framerate will not be
  * limited and fps will be printed to console every frame */
 #define MEASURE_FPS 0
+
+#if MEASURE_FPS == 1
+#include <ctime>
+#endif
 
 int main() {
 	if (!sf::Shader::isAvailable()) {
@@ -34,13 +37,21 @@ int main() {
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
-		}
 
+			// take a screenshot when the mouse is pressed
+			if (event.type == sf::Event::MouseButtonPressed) {
+				std::string filename = "screenshot.png";
+				sf::Texture texture;
+				texture.create(window.getSize().x, window.getSize().y);
+				texture.update(window);
+				if (texture.copyToImage().saveToFile(filename))
+				{
+					std::cout << "screenshot saved to " << filename << std::endl;
+				}
+			}
+		}
 		sf::Vector2u screenSize = window.getSize();
 
-		//sf::Texture texture;
-		//texture.create(screenSize.x, screenSize.y);
-		//sf::Sprite sprite(texture);
 		sf::RectangleShape rect(sf::Vector2f(screenSize.x, screenSize.y));
 		
 		// the direction of each ray is transformed with this matrix before marching
